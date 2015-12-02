@@ -1,9 +1,9 @@
 // Define local variables associated with video resolution selection
 // buttons in the HTML page
 
-var qvgaButton = docment.querySelector("button#qvga");
-var vgaButton = docment.querySelector("button#vga");
-var hdButton = docment.querySelector("button#hd");
+var qvgaButton = document.querySelector("button#qvga");
+var vgaButton = document.querySelector("button#vga");
+var hdButton = document.querySelector("button#hd");
 
 // Video element in the HTML5 page
 var video = document.querySelector("video");
@@ -24,10 +24,10 @@ navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia
 var constraints = {audio: false, video: true};
 
 // Callback to be called in case of success...
-function successCallback(stream) {
+function successCallback(gotStream) {
 
 	// Note: make the returned stream available to console for inspection
-	window.stream = stream;
+	window.stream = gotStream;
 
 	if (window.URL) {
 		// Chrome case: URL.createObjectURL() converts a MediaStream to a blob URL
@@ -45,5 +45,42 @@ function successCallback(stream) {
 function errorCallback(error){
 console.log("navigator.getUserMedia error: ", error);
 }
-// Main action: just call getUserMedia() on the navigator object
-navigator.getUserMedia(constraints, successCallback, errorCallback);
+
+var qvgaConstraints  = {
+  video: {
+    mandatory: {
+      maxWidth: 320,
+      maxHeight: 240
+    }
+  }
+};
+
+var vgaConstraints  = {
+  video: {
+    mandatory: {
+      maxWidth: 640,
+      maxHeight: 480
+    }
+  }
+};
+
+var hdConstraints  = {
+  video: {
+    mandatory: {
+      minWidth: 1280,
+      minHeight: 960
+    }
+  }
+};
+
+qvgaButton.onclick = function(){getMedia(qvgaConstraints)};
+vgaButton.onclick = function(){getMedia(vgaConstraints)};
+hdButton.onclick = function(){getMedia(hdConstraints)};
+
+function getMedia(constraints){
+  if (!!stream) {
+    video.src = null;
+    stream.stop();
+  }
+  navigator.getUserMedia(constraints, successCallback, errorCallback);
+}
